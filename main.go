@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	port := flag.String("port", ":8000", "Port on which application should listen")
 	socket := flag.String("socket", "", "Path to osquery socket file")
 	flag.Parse()
 	if *socket == "" {
@@ -29,7 +30,7 @@ func main() {
 
 	app.Get("/", c.handler)
 
-	app.Listen(":8080")
+	app.Listen(*port)
 }
 
 type controller struct {
