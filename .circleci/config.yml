@@ -20,7 +20,7 @@ jobs:
       - run:
           name: Deploy Over SSH
           command: |
-            ssh $SSH_USER@$SSH_HOST "./deploy/script.sh {{REPO_NAME}}"
+            ssh $SSH_USER@$SSH_HOST "./deploy/script.sh deploy/osquery-server"
 
 workflows:
    version: 2
