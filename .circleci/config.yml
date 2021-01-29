@@ -1,8 +1,17 @@
 version: 2
 
 jobs:
-  deploy-job:
-    machine: # executor type
+  build:
+      docker:
+        - image: circleci/golang:1.15
+      working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+      steps:
+        - checkout
+        - run: go get -v -t -d ./...
+        - run: go test -v ./...
+    
+  deploy:
+    machine:
       image: ubuntu-2004:202010-01
     steps:
       - add_ssh_keys:
@@ -12,3 +21,15 @@ jobs:
           name: Deploy Over SSH
           command: |
             ssh $SSH_USER@$SSH_HOST "ls -la"
+
+workflows:
+   version: 2
+   build-and-deploy:
+     jobs:
+       - build
+       - deploy:
+           requires:
+             - build # only deploy once build job has completed
+           filters:
+             branches:
+               only: master # only deploy on the master branch
