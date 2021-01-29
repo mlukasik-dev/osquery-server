@@ -1,4 +1,4 @@
 all: deploy
 
 deploy:
-  go run main.go
+  go build -v ./...
