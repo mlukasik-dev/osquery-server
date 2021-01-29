@@ -1,1 +1,3 @@
 # osquery-server
+
+## Installation:
