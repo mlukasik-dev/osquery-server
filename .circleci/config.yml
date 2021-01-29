@@ -16,11 +16,11 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "82:8d:99:87:ff:c2:11:5c:f3:cb:ab:ae:28:8f:35:fa"
+            - "4c:57:23:da:7b:fc:79:27:14:83:44:7a:49:c6:5a:f5"
       - run:
           name: Deploy Over SSH
           command: |
-            ssh $SSH_USER@$SSH_HOST "ls -la"
+            ssh $SSH_USER@$SSH_HOST "./deploy/script.sh {{REPO_NAME}}"
 
 workflows:
    version: 2
@@ -29,7 +29,7 @@ workflows:
        - build
        - deploy:
            requires:
-             - build # only deploy once build job has completed
+             - build
            filters:
              branches:
-               only: master # only deploy on the master branch
+               only: master
