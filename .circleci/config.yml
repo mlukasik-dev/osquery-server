@@ -2,6 +2,8 @@ version: 2
 
 jobs:
   deploy-job:
+    machine: # executor type
+      image: ubuntu-2004:202010-01
     steps:
       - add_ssh_keys:
           fingerprints:
