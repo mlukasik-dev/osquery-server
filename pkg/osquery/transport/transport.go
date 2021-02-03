@@ -4,12 +4,12 @@ package transport
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"os"
 	"time"
 
 	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/pkg/errors"
 )
 
 // Open opens the unix domain socket with the provided path and timeout,
@@ -17,7 +17,7 @@ import (
 func Open(sockPath string, timeout time.Duration) (*thrift.TSocket, error) {
 	addr, err := net.ResolveUnixAddr("unix", sockPath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "resolving socket path '%s'", sockPath)
+		return nil, fmt.Errorf("resolving socket path '%s': %w", sockPath, err)
 	}
 
 	// the timeout parameter is passed to thrift, which passes it to net.DialTimeout
@@ -25,12 +25,12 @@ func Open(sockPath string, timeout time.Duration) (*thrift.TSocket, error) {
 	// waitForSocket will loop every 200ms to stat the socket path,
 	// or until the timeout value passes, similar to the C++ and python implementations.
 	if err := waitForSocket(sockPath, timeout); err != nil {
-		return nil, errors.Wrapf(err, "waiting for unix socket to be available: %s", sockPath)
+		return nil, fmt.Errorf("waiting for unix socket to be available: %s: %w", sockPath, err)
 	}
 
-	trans := thrift.NewTSocketFromAddrTimeout(addr, timeout, timeout)
+	trans := thrift.NewTSocketFromAddrTimeout(addr, timeout)
 	if err := trans.Open(); err != nil {
-		return nil, errors.Wrap(err, "opening socket transport")
+		return nil, fmt.Errorf("opening socket transport: %w", err)
 	}
 
 	return trans, nil
@@ -39,7 +39,7 @@ func Open(sockPath string, timeout time.Duration) (*thrift.TSocket, error) {
 func OpenServer(listenPath string, timeout time.Duration) (*thrift.TServerSocket, error) {
 	addr, err := net.ResolveUnixAddr("unix", listenPath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "resolving addr (%s)", addr)
+		return nil, fmt.Errorf("resolving addr (%s): %w", addr, err)
 	}
 
 	return thrift.NewTServerSocketFromAddrTimeout(addr, 0), nil

@@ -1,12 +1,12 @@
 package transport
 
 import (
+	"fmt"
 	"net"
 	"sync"
 	"time"
 
 	"github.com/Microsoft/go-winio"
-	"github.com/pkg/errors"
 
 	"github.com/apache/thrift/lib/go/thrift"
 )
@@ -16,7 +16,7 @@ import (
 func Open(path string, timeout time.Duration) (*thrift.TSocket, error) {
 	conn, err := winio.DialPipe(path, &timeout)
 	if err != nil {
-		return nil, errors.Wrapf(err, "dialing pipe '%s'", path)
+		return nil, fmt.Errorf("dialing pipe '%s': %w", path, err)
 	}
 	return thrift.NewTSocketFromConnTimeout(conn, timeout), nil
 }
@@ -70,7 +70,7 @@ func (p *TServerPipe) Accept() (thrift.TTransport, error) {
 	p.mu.RUnlock()
 
 	if interrupted {
-		return nil, errors.New("transport interrupted")
+		return nil, fmt.Errorf("transport interrupted")
 	}
 
 	conn, err := listener.Accept()

@@ -2,12 +2,11 @@ package osquery
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/mlukasik-dev/osquery-server/pkg/osquery/gen/osquery"
 	"github.com/mlukasik-dev/osquery-server/pkg/osquery/transport"
-
-	"github.com/pkg/errors"
 
 	"github.com/apache/thrift/lib/go/thrift"
 )
@@ -92,13 +91,13 @@ func (c *ExtensionManagerClient) Query(sql string) (*osquery.ExtensionResponse, 
 func (c *ExtensionManagerClient) QueryRows(sql string) ([]map[string]string, error) {
 	res, err := c.Query(sql)
 	if err != nil {
-		return nil, errors.Wrap(err, "transport error in query")
+		return nil, fmt.Errorf("transport error in query: %w", err)
 	}
 	if res.Status == nil {
-		return nil, errors.New("query returned nil status")
+		return nil, fmt.Errorf("query returned nil status")
 	}
 	if res.Status.Code != 0 {
-		return nil, errors.Errorf("query returned error: %s", res.Status.Message)
+		return nil, fmt.Errorf("query returned error: %s", res.Status.Message)
 	}
 	return res.Response, nil
 
@@ -112,7 +111,7 @@ func (c *ExtensionManagerClient) QueryRow(sql string) (map[string]string, error)
 		return nil, err
 	}
 	if len(res) != 1 {
-		return nil, errors.Errorf("expected 1 row, got %d", len(res))
+		return nil, fmt.Errorf("expected 1 row, got %d", len(res))
 	}
 	return res[0], nil
 }
