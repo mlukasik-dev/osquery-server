@@ -11,4 +11,8 @@ gen:
 		${OSQUERY_PKG_PATH}/gen/osquery/extension_manager-remote
 	gofmt -w ${OSQUERY_PKG_PATH}/gen
 
-.PHONY: gen
+build:
+	mkdir -p bin
+	go build -o bin/ ./...
+
+.PHONY: gen build
